@@ -1,0 +1,14 @@
+{
+  "name": "stellarproof",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:contracts": "bash scripts/build-contracts.sh",
+    "lint": "pnpm --filter frontend lint"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
