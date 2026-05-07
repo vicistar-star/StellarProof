@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "detection",
+    "oracle",
+    "reputation",
+    "registry",
+]
+resolver = "2"
