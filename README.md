@@ -14,7 +14,7 @@ By leveraging Stellar's ultra-low transaction fees (~0.00001 XLM), fast 3–5 se
 | Goal | Detect deepfakes and verify human-created media authenticity on-chain |
 | Blockchain | Stellar Network |
 | Smart Contracts | Soroban (Rust/WASM) |
-| Frontend | Next.js + TypeScript + Tailwind CSS |
+| Frontend | Next.js 15 + TypeScript + Tailwind CSS |
 | Storage | IPFS (decentralized) or MongoDB (high performance) |
 | AI Detection | On-premise deepfake detection model (TEE-isolated) |
 | Trusted Execution | Oracle-driven TEE using AWS Nitro Enclave |
@@ -69,26 +69,42 @@ Creator Reputation Registry
 StellarProof/
 ├── package.json
 ├── pnpm-workspace.yaml
+├── pnpm-lock.yaml
 ├── tsconfig.base.json
+├── .env.example
+├── CONTRIBUTING.md
+│
+├── scripts/
+│   ├── build-contracts.sh
+│   └── deploy-contracts.sh
 │
 ├── frontend/
 │   ├── app/
 │   │   ├── layout.tsx
 │   │   ├── page.tsx
+│   │   ├── globals.css
 │   │   ├── api/health/route.ts
+│   │   ├── api/detect/submit/route.ts
+│   │   ├── api/detect/status/[jobId]/route.ts
+│   │   ├── api/detect/challenge/[certId]/route.ts
+│   │   ├── api/creator/[stellarKey]/reputation/route.ts
 │   │   └── creator/submit/page.tsx     # Submit media for deepfake analysis
 │   ├── components/
 │   │   ├── DetectionResult.tsx         # AI/human verdict display
 │   │   └── CreatorScore.tsx            # Reputation score card
 │   ├── next.config.ts
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
 │   └── package.json
 │
 ├── contracts/
+│   ├── Cargo.toml                      # Cargo workspace
 │   ├── oracle/                         # Verification request + attestation
 │   │   ├── src/lib.rs
 │   │   └── Cargo.toml
 │   ├── detection/                      # Deepfake detection certificate minting
 │   │   ├── src/lib.rs
+│   │   ├── src/test.rs
 │   │   └── Cargo.toml
 │   ├── reputation/                     # Creator reputation scoring registry
 │   │   ├── src/lib.rs
@@ -99,8 +115,10 @@ StellarProof/
 │
 └── packages/
     └── shared/
+        ├── index.ts
         ├── types/index.ts
         ├── utils/hash.ts
+        ├── tsconfig.json
         └── package.json
 ```
 
@@ -225,9 +243,10 @@ Each certificate contains:
 ### Installation
 
 ```bash
-git clone https://github.com/your-org/StellarProof.git
+git clone https://github.com/vicistar-star/StellarProof.git
 cd StellarProof
 pnpm install
+cp .env.example .env.local   # fill in values as needed
 ```
 
 ### Run Frontend
@@ -240,13 +259,31 @@ pnpm dev:frontend
 ### Build Soroban Contracts
 
 ```bash
+pnpm build:contracts
+```
+
+Or build individually:
+
+```bash
 cd contracts/oracle     && stellar contract build
 cd ../detection         && stellar contract build
 cd ../reputation        && stellar contract build
 cd ../registry          && stellar contract build
 ```
 
+### Run Contract Tests
+
+```bash
+cd contracts/detection && cargo test
+```
+
 ### Deploy to Testnet
+
+```bash
+bash scripts/deploy-contracts.sh testnet
+```
+
+Or deploy a single contract:
 
 ```bash
 stellar contract deploy \
@@ -271,24 +308,28 @@ stellar contract deploy \
 
 ## 🗺️ Roadmap
 
-| Phase | Description |
-|---|---|
-| Phase 0 | Architecture design — detection schema, Soroban contract interfaces, TEE model selection |
-| Phase 1 | MVP — upload UI, basic deepfake scoring, on-chain certificate minting |
-| Phase 2 | Reputation system — creator scoring, on-chain history, public reputation API |
-| Phase 3 | Dispute system — challenge flow, re-analysis, XLM stake mechanism |
-| Phase 4 | Model governance — on-chain model hash registry, community upgrade voting |
-| Phase 5 | Platform integrations — SDK, webhooks, social media plugin APIs |
+| Phase | Status | Description |
+|---|---|---|
+| Phase 0 | ✅ Complete | Architecture design — detection schema, Soroban contract interfaces, TEE model selection |
+| Phase 1 | ✅ Complete | MVP — upload UI, basic deepfake scoring, on-chain certificate minting |
+| Phase 2 | ✅ Complete | Reputation system — creator scoring, on-chain history, public reputation API |
+| Phase 3 | 🔄 In Progress | Dispute system — challenge flow, re-analysis, XLM stake mechanism |
+| Phase 4 | ⏳ Planned | Model governance — on-chain model hash registry, community upgrade voting |
+| Phase 5 | ⏳ Planned | Platform integrations — SDK, webhooks, social media plugin APIs |
 
 ---
 
 ## 🤝 Contributing
 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions, open work areas, commit conventions, and the PR checklist.
+
+Quick start:
+
 1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Commit your changes: `git commit -m 'Add my feature'`
-4. Push: `git push origin feature/my-feature`
-5. Open a Pull Request.
+2. Create a feature branch: `git checkout -b feat/my-feature`
+3. Commit your changes using [conventional commits](https://www.conventionalcommits.org/).
+4. Push: `git push origin feat/my-feature`
+5. Open a Pull Request — a template will guide you.
 
 ---
 
@@ -310,3 +351,4 @@ stellar contract deploy \
 
 StellarProof aims to become the **universal anti-deepfake trust layer** for digital media across the Stellar ecosystem — giving creators, journalists, and platforms a cryptographically verifiable answer to the question:
 
+> *"Is this real?"*
