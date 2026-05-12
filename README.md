@@ -310,4 +310,3 @@ stellar contract deploy \
 
 StellarProof aims to become the **universal anti-deepfake trust layer** for digital media across the Stellar ecosystem — giving creators, journalists, and platforms a cryptographically verifiable answer to the question:
 
-> *"Is this real?"*
